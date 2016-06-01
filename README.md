@@ -44,7 +44,7 @@ you can make the following call:
 import "github.com/botmetrics/go-botmetrics"
 
 client := botmetrics.NewBotmetricsClient("api-key", "bot-id")
-client.registerBot('bot-token', 0)
+client.RegisterBot('bot-token', 0)
 ```
 
 #### Retroactive Registration
@@ -56,7 +56,7 @@ the UNIX timestamp of when your bot was created, like so:
 import "github.com/botmetrics/go-botmetrics"
 
 client := botmetrics.NewBotmetricsClient("api-key", "bot-id")
-client.registerBot('bot-token', 1462318092)
+client.RegisterBot('bot-token', 1462318092)
 ```
 
 ## Contributing
