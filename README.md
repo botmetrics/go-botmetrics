@@ -4,6 +4,9 @@ go-botmetrics is a Go client to the
 [BotMetrics](https://getbotmetrics.com) service which lets you collect
 &amp; analyze metrics for your bot.
 
+[![Build
+Status](https://travis-ci.org/botmetrics/go-botmetrics.svg?branch=master)](https://travis-ci.org/botmetrics/go-botmetrics)
+
 ## Usage
 
 Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate
