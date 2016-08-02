@@ -1,6 +1,7 @@
 package botmetrics
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -15,7 +16,8 @@ type BotmetricsClient struct {
 }
 
 var (
-	ErrClientNotConfigured = fmt.Errorf("Set the environment variables BOTMETRICS_API_KEY and BOTMETRICS_BOT_ID or call NewBotmetricsClient(\"api_key\", \"bot_id\")")
+	ErrClientNotConfigured  = fmt.Errorf("Set the environment variables BOTMETRICS_API_KEY and BOTMETRICS_BOT_ID or call NewBotmetricsClient(\"api_key\", \"bot_id\")")
+	ErrIncorrectAPIResponse = fmt.Errorf("Incorrect Botmetrics API Response")
 )
 
 func NewBotmetricsClient(args ...string) (*BotmetricsClient, error) {
@@ -75,4 +77,42 @@ func (b *BotmetricsClient) RegisterBot(token string, createdAt int64) bool {
 	}
 
 	return false
+}
+
+func (b *BotmetricsClient) Track(event string) (bool, error) {
+	var parsedEvent interface{}
+
+	err := json.Unmarshal([]byte(event), &parsedEvent)
+	if err != nil {
+		return false, err
+	}
+
+	params := url.Values{
+		"format": []string{"json"},
+		"event":  []string{event},
+	}
+	host := os.Getenv("BOTMETRICS_API_HOST")
+	if host == "" {
+		host = "https://www.getbotmetrics.com"
+	}
+	url := fmt.Sprintf("%s/bots/%s/events", host, b.BotId)
+
+	client := &http.Client{}
+	r, _ := http.NewRequest("POST", url, strings.NewReader(params.Encode()))
+	r.Header.Add("Authorization", b.ApiKey)
+	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Length", strconv.Itoa(len(params.Encode())))
+
+	resp, err := client.Do(r)
+
+	if err != nil {
+		return false, err
+	} else {
+		defer resp.Body.Close()
+		if resp.StatusCode == 201 {
+			return true, err
+		}
+	}
+
+	return false, ErrIncorrectAPIResponse
 }

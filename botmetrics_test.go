@@ -116,4 +116,70 @@ var _ = Describe("botmetrics", func() {
 			})
 		})
 	})
+
+	Describe("Track", func() {
+		var server *ghttp.Server
+		var bc *BotmetricsClient
+		var err error
+
+		BeforeEach(func() {
+			server = ghttp.NewServer()
+			os.Setenv("BOTMETRICS_API_HOST", server.URL())
+			bc, err = NewBotmetricsClient("api-key", "bot-id")
+			Expect(err).To(BeNil())
+		})
+
+		AfterEach(func() {
+			server.Close()
+			os.Unsetenv("BOTMETRICS_API_HOST")
+		})
+
+		verifyRequestResponse := func(server *ghttp.Server, method, uri, event string, responseCode int64) {
+			var verifier http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+				Expect(r.Method).To(Equal(method))
+				Expect(r.RequestURI).To(Equal(uri))
+				err := r.ParseForm()
+				Expect(err).To(BeNil())
+				Expect(r.Header.Get("Authorization")).To(Equal("api-key"))
+				Expect(r.PostFormValue("event")).To(Equal(event))
+				Expect(r.PostFormValue("format")).To(Equal("json"))
+
+				w.WriteHeader(int(responseCode))
+			}
+
+			server.AppendHandlers(verifier)
+		}
+
+		Context("successful API request", func() {
+			Context("with event", func() {
+				It("should return true", func() {
+					event := "{\"name\":\"event-name\", \"timestamp\": \"123456789.0\"}"
+
+					verifyRequestResponse(server, "POST", "/bots/bot-id/events", event, 201)
+					status, err := bc.Track(event)
+					Expect(status).To(BeTrue())
+					Expect(err).To(BeNil())
+				})
+			})
+
+			Context("with invalid JSON", func() {
+				It("should return true", func() {
+					status, err := bc.Track("invalid json")
+					Expect(status).To(BeFalse())
+					Expect(err).ToNot(BeNil())
+				})
+			})
+		})
+
+		Context("unsuccessful API request", func() {
+			It("should return false", func() {
+				event := "{\"name\":\"event-name\", \"timestamp\": \"123456789.0\"}"
+
+				verifyRequestResponse(server, "POST", "/bots/bot-id/events", event, 500)
+				status, err := bc.Track(event)
+				Expect(status).To(BeFalse())
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
 })
