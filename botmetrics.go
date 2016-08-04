@@ -109,7 +109,7 @@ func (b *BotmetricsClient) Track(event string) (bool, error) {
 		return false, err
 	} else {
 		defer resp.Body.Close()
-		if resp.StatusCode == 201 {
+		if resp.StatusCode == 202 {
 			return true, err
 		}
 	}

@@ -155,7 +155,7 @@ var _ = Describe("botmetrics", func() {
 				It("should return true", func() {
 					event := "{\"name\":\"event-name\", \"timestamp\": \"123456789.0\"}"
 
-					verifyRequestResponse(server, "POST", "/bots/bot-id/events", event, 201)
+					verifyRequestResponse(server, "POST", "/bots/bot-id/events", event, 202)
 					status, err := bc.Track(event)
 					Expect(status).To(BeTrue())
 					Expect(err).To(BeNil())
