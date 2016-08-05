@@ -7,7 +7,53 @@ go-botmetrics is a Go client to the
 [![Build
 Status](https://travis-ci.org/botmetrics/go-botmetrics.svg?branch=master)](https://travis-ci.org/botmetrics/go-botmetrics)
 
-## Usage
+## Usage (Facebook)
+
+Register your Facebook bot with
+[Botmetrics](https://getbotmetrics.com). Once you have done so, navigate to "Bot Settings" and find out your Bot ID and API Key.
+
+With that, you can initialize a `BotmetricsClient`:
+
+```go
+import "github.com/botmetrics/go-botmetrics"
+
+client := botmetrics.NewBotmetricsClient("api-key", "bot-id")
+```
+
+Alternatively, you can set the following ENV variables
+
+- `ENV['BOTMETRICS_API_KEY']`
+- `ENV['BOTMETRICS_BOT_ID']`
+
+and initialize a `BotmetricsClient` with the default ENV variables:
+
+```go
+import "github.com/botmetrics/go-botmetrics"
+
+client := botmetrics.NewBotmetricsClient()
+```
+
+### track
+
+Call the `track` API in the webhook receiver that handles all of your
+Facebook messages.
+
+For e.g.
+
+```go
+// In your Go Request handler, make a call to client.Track
+// with the post form value for the key "webhook"
+import "github.com/botmetrics/go-botmetrics"
+
+http.HandleFunc("/webhooks", func(w http.ResponseWriter, r *http.Request) {
+  client, err := botmetrics.NewBotMetricsClient()
+  if err != nil {
+    client.Track(r.PostFormValue("webhook"))
+  }
+})
+```
+
+## Usage (Slack)
 
 Log in to your [BotMetrics](https://getbotmetrics.com) account, navigate
 to "Bot Settings" and find out your Bot ID and API Key.
