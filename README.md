@@ -42,14 +42,20 @@ For e.g.
 
 ```go
 // In your Go Request handler, make a call to client.Track
-// with the post form value for the key "webhook"
+// with the request body
 import "github.com/botmetrics/go-botmetrics"
 
 http.HandleFunc("/webhooks", func(w http.ResponseWriter, r *http.Request) {
-  client, err := botmetrics.NewBotMetricsClient()
-  if err != nil {
-    client.Track(r.PostFormValue("webhook"))
-  }
+	postBody, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		panic(err)
+	}
+
+	client, err := botmetrics.NewBotMetricsClient()
+	if err == nil {
+		client.Track(postBody)
+	}
 })
 ```
 
