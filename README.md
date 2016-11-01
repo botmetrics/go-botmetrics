@@ -7,6 +7,14 @@ go-botmetrics is a Go client to the
 [![Build
 Status](https://travis-ci.org/botmetrics/go-botmetrics.svg?branch=master)](https://travis-ci.org/botmetrics/go-botmetrics)
 
+## Setting your API Host (for Self-Hosting)
+
+If you are using your own self-hosted version of Botmetrics, remember to
+set the `BOTMETRICS_API_HOST` environment variable to your host (If you
+have hosted your Botmetrics instance at
+`https://my-botmetrics-instance.herokuapp.com`, set
+`BOTMETRICS_API_HOST` to `https://my-botmetrics-instance.herokuapp.com`.
+
 ## Usage (Facebook)
 
 Register your Facebook bot with
